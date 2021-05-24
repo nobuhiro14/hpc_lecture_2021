@@ -38,12 +38,6 @@ int main(int argc, char** argv) {
 
   double comp_time = 0, comm_time = 0;
     auto tic = chrono::steady_clock::now();
-<<<<<<< HEAD
-#pragma acc parallel 
-{
- #pragma acc loop
-=======
->>>>>>> e6b8ac1d7e33820c8b6ad6a9f79547a56d1d001e
     for (int i=0; i<N; i++)
       for (int j=0; j<N; j++)
         for (int k=0; k<N; k++)
