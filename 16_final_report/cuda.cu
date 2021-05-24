@@ -17,6 +17,7 @@ __global__ void matrix(float *a, float*b, float*c,int offset,int size ,int N){
 int main(int argc, char** argv) {
   int size, rank;
   MPI_Init(&argc, &argv);
+
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
@@ -27,9 +28,9 @@ int main(int argc, char** argv) {
   vector<float> subA(N*N/size);
   vector<float> subB(N*N/size);
   vector<float> subC(N*N/size, 0);
-  vector<float> *a;
-  vector<float> *b;
-  vector<float> *c;
+  float *a;
+  float *b;
+  float *c;
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
       A[N*i+j] = drand48();
@@ -44,7 +45,17 @@ int main(int argc, char** argv) {
     for (int j=0; j<N/size; j++)
       subB[N/size*i+j] = B[N*i+j+offset];
 
-cublasSetVector(N*N/size,sizeof(float),(void**)&subA,(void **)&a);
+cudaMallocManaged(&a, N*N/size*sizeof(float));
+cudaMallocManaged(&b, N*N/size*sizeof(float));
+cudaMallocManaged(&c, N*N/size*sizeof(float));
+
+int offset = N/size*rank;
+for (int i=0; i<N/size; i++)
+  for (int j=0; j<N; j++)
+    a[N*i+j] = A[N*(i+offset)+j];
+for (int i=0; i<N; i++)
+  for (int j=0; j<N/size; j++)
+    b[N/size*i+j] = B[N*i+j+offset];
 
   int recv_from = (rank + 1) % size;
   int send_to = (rank - 1 + size) % size;
