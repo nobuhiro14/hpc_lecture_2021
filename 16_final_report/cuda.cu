@@ -59,7 +59,7 @@ for (int i=0; i<N; i++)
   for (int i=0; i<N; i++)
     for (int j=0; j<N; j++)
       err += fabs(C[N*i+j]);
-
+double time = comp_time+comm_time;
     printf("N    : %d\n",N);
     printf("comp : %lf s\n", comp_time);
     printf("comm : %lf s\n", comm_time);
