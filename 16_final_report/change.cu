@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
           subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
-    cudaMemcpy(c,subc,N*N/size*sizeof(float),cudaMemcpyDeviceToHost);
+    cudaMemcpy(c,subC,N*N/size*sizeof(float),cudaMemcpyDeviceToHost);
 
     MPI_Send(&subB[0], N*N/size, MPI_FLOAT, send_to, 0, MPI_COMM_WORLD);
     MPI_Recv(&subB[0], N*N/size, MPI_FLOAT, recv_from, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
@@ -99,5 +99,5 @@ int main(int argc, char** argv) {
   MPI_Finalize();
   cudaFree(a);
   cudaFree(b);
-  cudaFree(c)
+  cudaFree(c);
 }
