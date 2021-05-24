@@ -20,12 +20,8 @@ int main(int argc, char** argv) {
   vector<float> A(N*N);
   vector<float> B(N*N);
   vector<float> C(N*N, 0);
-  vector<float> subA(N*N/size);
-  vector<float> subB(N*N/size);
-  vector<float> subC(N*N/size, 0);
+ 
   float *a;
-  float *b;
-  float *c;
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
       A[N*i+j] = drand48();
@@ -36,12 +32,6 @@ int main(int argc, char** argv) {
 cudaMallocManaged(&a, N*N*sizeof(float));
 
 
-for (int i=0; i<N/size; i++)
-  for (int j=0; j<N; j++)
-    a[N*i+j] = A[N*(i+offset)+j];
-for (int i=0; i<N; i++)
-  for (int j=0; j<N/size; j++)
-    b[N/size*i+j] = B[N*i+j+offset];
 for (int i=0; i<N; i++)
   for (int j=0; j<N; j++)
     a[N*i+j] = A[N*i+j];
