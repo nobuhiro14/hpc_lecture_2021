@@ -1,8 +1,9 @@
-#include <mpi.h>
+include <mpi.h>
 #include <cstdio>
-#include <cstdlib>
 #include <cmath>
 #include <vector>
+#include <chrono>
+using namespace std;
 
 int main(int argc, char** argv) {
   int size, rank;
