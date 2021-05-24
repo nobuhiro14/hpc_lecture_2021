@@ -7,7 +7,7 @@
 using namespace std;
 
 
-__global__ void matrix(float *a, float*b, float*c,int offset,int size ){
+__global__ void matrix(float *a, float*b, float*c,int offset,int size ,int N){
   for (int i=0; i<N/size; i++)
     for (int j=0; j<N/size; j++)
       for (int k=0; k<N; k++)
