@@ -12,14 +12,6 @@ int main(int argc, char** argv) {
   vector<float> A(N*N);
   vector<float> B(N*N);
   vector<float> C(N*N, 0);
-
-  float *subA;
-  float *subB;
-  float *subC;
-
-  cudaMallocManaged(&subA,N*N/M*sizeof(float));
-  cudaMallocManaged(&subB,N*N/M*sizeof(float));
-  cudaMallocManaged(&subC,N*N/M*sizeof(float));
   vector<float> subA(N*N/M);
   vector<float> subB(N*N/M);
   vector<float> subC(N*N/M, 0);
@@ -36,8 +28,6 @@ int main(int argc, char** argv) {
     for (int j=0; j<N; j++)
       subA[N*i+j] = A[N*(i+offset)+j];
   for (int i=0; i<N; i++)
-    for (int j=0; j<N/M; j++)
-      subB[N/M*i+j] = B[N*i+j+offset];
     for (int j=0; j<N/size; j++)
       subB[N/size*i+j] = B[N*i+j+offset];
 
@@ -52,11 +42,10 @@ int main(int argc, char** argv) {
   cudaMemcpy(subB,cuB,N*N/M*(float),cudaMemcpyHostToDevice);
   //cudaMemcpy(a,b,Bytes,cudaMemcpyHostToDevice);
 
- //target parallelrithm
+  //target parallelrithm
 
   double comp_time = 0, comm_time = 0;
     auto tic = chrono::steady_clock::now();
-
     for (int i=0; i<N; i++)
       for (int j=0; j<N; j++)
         for (int k=0; k<N; k++)
