@@ -18,12 +18,15 @@ int main(int argc, char** argv) {
   vector<float> subA(N*N/size);
   vector<float> subB(N*N/size);
   vector<float> subC(N*N/size, 0);
+
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
       A[N*i+j] = drand48();
       B[N*i+j] = drand48();
     }
   }
+
+  //target parallelrithm
   int offset = N/size*rank;
   for (int i=0; i<N/size; i++)
     for (int j=0; j<N; j++)
@@ -50,6 +53,8 @@ int main(int argc, char** argv) {
     comm_time += chrono::duration<double>(tic - toc).count();
   }
   MPI_Allgather(&subC[0], N*N/size, MPI_FLOAT, &C[0], N*N/size, MPI_FLOAT, MPI_COMM_WORLD);
+
+  // targets end here 
   for (int i=0; i<N; i++)
     for (int j=0; j<N; j++)
       for (int k=0; k<N; k++)
