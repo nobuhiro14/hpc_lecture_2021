@@ -49,7 +49,6 @@ cudaMallocManaged(&a, N*N/size*sizeof(float));
 cudaMallocManaged(&b, N*N/size*sizeof(float));
 cudaMallocManaged(&c, N*N/size*sizeof(float));
 
-int offset = N/size*rank;
 for (int i=0; i<N/size; i++)
   for (int j=0; j<N; j++)
     a[N*i+j] = A[N*(i+offset)+j];
