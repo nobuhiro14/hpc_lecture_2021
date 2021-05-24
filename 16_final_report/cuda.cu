@@ -28,18 +28,18 @@ int main(int argc, char** argv) {
     for (int j=0; j<N; j++)
       subA[N*i+j] = A[N*(i+offset)+j];
   for (int i=0; i<N; i++)
-    for (int j=0; j<N/size; j++)
-      subB[N/size*i+j] = B[N*i+j+offset];
+    for (int j=0; j<N/M; j++)
+      subB[N/M*i+j] = B[N*i+j+offset];
 
   float *cuA;
   float *cuB;
   float *cuC;
 
-  cudaMalloc((void**)&cuA,N*N/M*(float));
-  cudaMalloc((void**)&cuB,N*N/M*(float));
-  cudaMalloc((void**)&cuC,N*N/M*(float));
-  cudaMemcpy(subA,cuA,N*N/M*(float),cudaMemcpyHostToDevice);
-  cudaMemcpy(subB,cuB,N*N/M*(float),cudaMemcpyHostToDevice);
+  cudaMalloc((void**)&cuA,N*N/M*sizeof(float));
+  cudaMalloc((void**)&cuB,N*N/M*sizeof(float));
+  cudaMalloc((void**)&cuC,N*N/M*sizeof(float));
+  cudaMemcpy(cuA,subA,N*N/M*sizeof(float),cudaMemcpyHostToDevice);
+  cudaMemcpy(subB,cuB,N*N/M*sizeof(float),cudaMemcpyHostToDevice);
   //cudaMemcpy(a,b,Bytes,cudaMemcpyHostToDevice);
 
   //target parallelrithm
