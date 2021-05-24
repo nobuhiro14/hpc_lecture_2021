@@ -3,6 +3,7 @@
 #include <vector>
 #include <chrono>
 #include <cstdlib>
+#include <openacc.h>
 using namespace std;
 
 int main(int argc, char** argv) {
@@ -24,9 +25,9 @@ int main(int argc, char** argv) {
 
   double comp_time = 0, comm_time = 0;
     auto tic = chrono::steady_clock::now();
-#pragma omp parallel 
+#pragma acc parallel 
 {
- #pragma omp for
+ #pragma acc loop
     for (int i=0; i<N; i++)
       for (int j=0; j<N; j++) 
         for (int k=0; k<N; k++)
