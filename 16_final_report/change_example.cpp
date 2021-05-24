@@ -3,7 +3,7 @@
 #include <cmath>
 #include <vector>
 #include <chrono>
-#include <stdlib.h>
+#include<stdlib.h>
 using namespace std;
 
 int main(int argc, char** argv) {
@@ -16,25 +16,30 @@ int main(int argc, char** argv) {
   vector<float> A(N*N);
   vector<float> B(N*N);
   vector<float> C(N*N, 0);
-  vector<float> subA(N*N/size);
-  vector<float> subB(N*N/size);
-  vector<float> subC(N*N/size, 0);
+  int gpusize, gpurank, len;
+  cudaGetDeviceCount(&gpusize);
+  cudaSetDevice(rank % gpusize);
+  cudaGetDevice(&gpurank);
+  float *a;
+  float *b;
+  float *c;
 
+  cudaMallocManaged(&a, N*N/size*sizeof(float));
+  cudaMallocManaged(&b, N*N/size*sizeof(float));
+  cudaMallocManaged(&c, N*N/size*sizeof(float));
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
       A[N*i+j] = drand48();
       B[N*i+j] = drand48();
     }
   }
-
-  //target parallelrithm
   int offset = N/size*rank;
   for (int i=0; i<N/size; i++)
     for (int j=0; j<N; j++)
       subA[N*i+j] = A[N*(i+offset)+j];
   for (int i=0; i<N; i++)
     for (int j=0; j<N/size; j++)
-      subB[N*j+i] = B[N*i+j+offset];
+      subB[N/size*i+j] = B[N*i+j+offset];
   int recv_from = (rank + 1) % size;
   int send_to = (rank - 1 + size) % size;
 
@@ -45,7 +50,7 @@ int main(int argc, char** argv) {
     for (int i=0; i<N/size; i++)
       for (int j=0; j<N/size; j++)
         for (int k=0; k<N; k++)
-          subC[N*i+j+offset] += subA[N*i+k] * subB[N*j+k];
+          subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
     MPI_Send(&subB[0], N*N/size, MPI_FLOAT, send_to, 0, MPI_COMM_WORLD);
@@ -54,8 +59,6 @@ int main(int argc, char** argv) {
     comm_time += chrono::duration<double>(tic - toc).count();
   }
   MPI_Allgather(&subC[0], N*N/size, MPI_FLOAT, &C[0], N*N/size, MPI_FLOAT, MPI_COMM_WORLD);
-
-  // targets end here
   for (int i=0; i<N; i++)
     for (int j=0; j<N; j++)
       for (int k=0; k<N; k++)

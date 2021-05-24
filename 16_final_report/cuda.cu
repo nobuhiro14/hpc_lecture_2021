@@ -30,7 +30,10 @@ int main(int argc, char** argv) {
   }
 
 cudaMallocManaged(&a, N*N*sizeof(float));
-
+int gpusize, gpurank, len;
+cudaGetDeviceCount(&gpusize);
+cudaSetDevice(0);
+cudaGetDevice(&gpurank);
 
 for (int i=0; i<N; i++)
   for (int j=0; j<N; j++)
@@ -65,5 +68,7 @@ double time = comp_time+comm_time;
     printf("comm : %lf s\n", comm_time);
     printf("total: %lf s (%lf GFlops)\n",time,2.*N*N*N/time/1e9);
     printf("error: %lf\n",err/N/N);
+    printf("gpusize: %d\n",gpusize);
+    printf("gpurank: %d\n",gpurank);
 
 }
