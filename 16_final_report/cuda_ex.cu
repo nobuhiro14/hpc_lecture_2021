@@ -36,8 +36,8 @@ int main(int argc, char** argv) {
   cudaMalloc((void**)&cuA,N*N*sizeof(float));
   cudaMalloc((void**)&cuB,N*N*sizeof(float));
   cudaMalloc((void**)&cuC,N*N*sizeof(float));
-  cudaMemcpy(cuA,subA,N*N*sizeof(float),cudaMemcpyHostToDevice);
-  cudaMemcpy(cuB,subB,N*N*sizeof(float),cudaMemcpyHostToDevice);
+  cudaMemcpy(cuA,A,N*N*sizeof(float),cudaMemcpyHostToDevice);
+  cudaMemcpy(cuB,B,N*N*sizeof(float),cudaMemcpyHostToDevice);
   //cudaMemcpy(a,b,Bytes,cudaMemcpyHostToDevice);
 
   //target parallelrithm
@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
     auto tic = chrono::steady_clock::now();
     mtrix<<<(N*N+M-1)/M,M>>>(cuA,cuB,cuC,N);
     cudaDeviceSynchronize();
-
+    cudaMemcpy(cuC,C,N*N*sizeof(float),cudaMemcpyDeviceToHost);
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
 
