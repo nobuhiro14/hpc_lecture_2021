@@ -2,8 +2,6 @@
 #include <cstdio>
 #include <cmath>
 #include <vector>
-#include <chrono>
-using namespace std;
 
 int main(int argc, char** argv) {
   int size, rank;
@@ -54,7 +52,7 @@ int main(int argc, char** argv) {
   }
   MPI_Allgather(&subC[0], N*N/size, MPI_FLOAT, &C[0], N*N/size, MPI_FLOAT, MPI_COMM_WORLD);
 
-  // targets end here 
+  // targets end here
   for (int i=0; i<N; i++)
     for (int j=0; j<N; j++)
       for (int k=0; k<N; k++)
