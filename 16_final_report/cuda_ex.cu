@@ -5,17 +5,22 @@
 #include <cstdlib>
 using namespace std;
 
+
+__global__ void mtrix(float *a, float *b, float*c,int N){
+  for (int i=0; i<N; i++)
+    for (int j=0; j<N; j++)
+      for (int k=0; k<N; k++)
+        c[N*i+j] += a[N*i+k] * b[N*k+j];
+
+}
 int main(int argc, char** argv) {
 
   const int N = 256;
   const int M = 64;
-  vector<float> A(N*N);
-  vector<float> B(N*N);
-  vector<float> C(N*N, 0);
+  float A[N*N];
+  float B[N*N];
+  float C[N*N];
 
-  vector<float> subA(N*N/M);
-  vector<float> subB(N*N/M);
-  vector<float> subC(N*N/M,0);
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
       A[N*i+j] = drand48();
@@ -23,34 +28,24 @@ int main(int argc, char** argv) {
     }
   }
 
-  int offset = N/M*blockIdx.x;
-  for (int i=0; i<N/M; i++)
-    for (int j=0; j<N; j++)
-      subA[N*i+j] = A[N*(i+offset)+j];
-  for (int i=0; i<N; i++)
-    for (int j=0; j<N/M; j++)
-      subB[N/M*i+j] = B[N*i+j+offset];
-    
+
   float *cuA;
   float *cuB;
   float *cuC;
 
-  cudaMalloc((void**)&cuA,N*N/M*(float));
-  cudaMalloc((void**)&cuB,N*N/M*(float));
-  cudaMalloc((void**)&cuC,N*N/M*(float));
-  cudaMemcpy(subA,cuA,N*N/M*(float),cudaMemcpyHostToDevice);
-  cudaMemcpy(subB,cuB,N*N/M*(float),cudaMemcpyHostToDevice);
+  cudaMalloc((void**)&cuA,N*N*sizeof(float));
+  cudaMalloc((void**)&cuB,N*N*sizeof(float));
+  cudaMalloc((void**)&cuC,N*N*sizeof(float));
+  cudaMemcpy(cuA,subA,N*N*sizeof(float),cudaMemcpyHostToDevice);
+  cudaMemcpy(cuB,subB,N*N*sizeof(float),cudaMemcpyHostToDevice);
   //cudaMemcpy(a,b,Bytes,cudaMemcpyHostToDevice);
 
- //target parallelrithm
+  //target parallelrithm
 
   double comp_time = 0, comm_time = 0;
     auto tic = chrono::steady_clock::now();
-
-    for (int i=0; i<N; i++)
-      for (int j=0; j<N; j++)
-        for (int k=0; k<N; k++)
-          C[N*i+j] += A[N*i+k] * B[N*k+j];
+    mtrix<<<(N*N+M-1)/M,M>>>(cuA,cuB,cuC,N);
+    cudaDeviceSynchronize();
 
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
