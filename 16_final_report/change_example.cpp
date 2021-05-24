@@ -6,7 +6,7 @@
 #include<stdlib.h>
 using namespace std;
 
-__gloabl__ void matrix(int *a, int*b, int*c, int N){
+__global__ void matrix(int *a, int*b, int*c, int N){
   int i = blockIdx.x * blockDim.x + threadIdx.x;
   if (i <=N){
 
@@ -22,6 +22,9 @@ int main(int argc, char** argv) {
   vector<float> A(N*N);
   vector<float> B(N*N);
   vector<float> C(N*N, 0);
+  vector<float> subA(N*N/size);
+  vector<float> subB(N*N/size);
+  vector<float> subC(N*N/size, 0);
   int gpusize, gpurank ;
 
   float *a;
