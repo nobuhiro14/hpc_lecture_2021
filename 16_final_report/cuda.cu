@@ -12,9 +12,9 @@ int main(int argc, char** argv) {
   vector<float> A(N*N);
   vector<float> B(N*N);
   vector<float> C(N*N, 0);
-  vector<float> subA(N*N/M);
-  vector<float> subB(N*N/M);
-  vector<float> subC(N*N/M, 0);
+  float subA[N*N/M];
+  float subB[N*N/M];
+  float subC[N*N/M][ 0];
 
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
     }
   }
 
-  int offset = N/M*blockIdx.x;
+  int offset = N/M*(N+M-1)/M;
   for (int i=0; i<N/M; i++)
     for (int j=0; j<N; j++)
       subA[N*i+j] = A[N*(i+offset)+j];
