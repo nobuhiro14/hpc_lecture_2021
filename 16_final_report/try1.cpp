@@ -47,5 +47,5 @@ int main(int argc, char** argv) {
     printf("comm : %lf s\n", comm_time);
     printf("total: %lf s (%lf GFlops)\n",time,2.*N*N*N/time/1e9);
     printf("error: %lf\n",err/N/N);
-  
+
 }
