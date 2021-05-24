@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
       printf("Hostname    : %s\n", hostname);
       printf("MPI rank    : %d / %d  GPU device : %d / %d\n",
              mpirank, mpisize, gpurank, gpusize);
-      GPU_Kernel<<<2,2>>>();
+      GPU_Kernel<<<4,4>>>();
       cudaDeviceSynchronize();
     }
   }
