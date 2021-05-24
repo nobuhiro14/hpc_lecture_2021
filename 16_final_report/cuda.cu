@@ -14,13 +14,13 @@ __global__ void matrix(float *a, float*b, float*c,int offset,int size ,int N){
 
 }
 int main(int argc, char** argv) {
-  
+
 
   const int N = 256;
   vector<float> A(N*N);
   vector<float> B(N*N);
   vector<float> C(N*N, 0);
- 
+
   float *a;
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
@@ -47,6 +47,8 @@ for (int i=0; i<N; i++)
           C[N*i+j] += A[N*i+k] * B[N*k+j];
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
+    tic = chrono::steady_clock::now();
+    comm_time += chrono::duration<double>(tic - toc).count();
 
 
   for (int i=0; i<N; i++)
