@@ -12,6 +12,7 @@ int main(int argc, char** argv) {
   vector<float> A(N*N);
   vector<float> B(N*N);
   vector<float> C(N*N, 0);
+
   float *subA;
   float *subB;
   float *subC;
@@ -19,6 +20,9 @@ int main(int argc, char** argv) {
   cudaMallocManaged(&subA,N*N/M*sizeof(float));
   cudaMallocManaged(&subB,N*N/M*sizeof(float));
   cudaMallocManaged(&subC,N*N/M*sizeof(float));
+  vector<float> subA(N*N/M);
+  vector<float> subB(N*N/M);
+  vector<float> subC(N*N/M, 0);
 
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
@@ -34,16 +38,25 @@ int main(int argc, char** argv) {
   for (int i=0; i<N; i++)
     for (int j=0; j<N/M; j++)
       subB[N/M*i+j] = B[N*i+j+offset];
-  //target parallelrithm
+    for (int j=0; j<N/size; j++)
+      subB[N/size*i+j] = B[N*i+j+offset];
+
+  float *cuA;
+  float *cuB;
+  float *cuC;
+
+  cudaMalloc(&cuA,N*N/M*(float));
+  cudaMalloc(&cuB,N*N/M*(float));
+  cudaMalloc(&cuC,N*N/M*(float));
+  cudaMemcpy(subA,cuA,N*N/M*(float),cudaMemcpyHostToDevice);
+  cudaMemcpy(subB,cuB,N*N/M*(float),cudaMemcpyHostToDevice);
+  //cudaMemcpy(a,b,Bytes,cudaMemcpyHostToDevice);
+
+ //target parallelrithm
 
   double comp_time = 0, comm_time = 0;
     auto tic = chrono::steady_clock::now();
-<<<<<<< HEAD
-#pragma acc parallel 
-{
- #pragma acc loop
-=======
->>>>>>> e6b8ac1d7e33820c8b6ad6a9f79547a56d1d001e
+
     for (int i=0; i<N; i++)
       for (int j=0; j<N; j++)
         for (int k=0; k<N; k++)
@@ -70,8 +83,8 @@ int main(int argc, char** argv) {
     printf("total: %lf s (%lf GFlops)\n",time,2.*N*N*N/time/1e9);
     printf("error: %lf\n",err/N/N);
 
-    cudaFree(subA);
-    cudaFree(subB);
-    cudaFree(subC);
+    cudaFree(cuA);
+    cudaFree(cuB);
+    cudaFree(cuC);
 
 }
