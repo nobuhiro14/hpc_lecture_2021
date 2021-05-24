@@ -2,6 +2,7 @@
 #include <cmath>
 #include <vector>
 #include <chrono>
+#include <cstdlib>
 using namespace std;
 
 int main(int argc, char** argv) {
@@ -23,10 +24,14 @@ int main(int argc, char** argv) {
 
   double comp_time = 0, comm_time = 0;
     auto tic = chrono::steady_clock::now();
+#pragma omp parallel 
+{
+ #pragma omp for
     for (int i=0; i<N; i++)
-      for (int j=0; j<N; j++)
+      for (int j=0; j<N; j++) 
         for (int k=0; k<N; k++)
           C[N*i+j] += A[N*i+k] * B[N*k+j];
+}
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
 
