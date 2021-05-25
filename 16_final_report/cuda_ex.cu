@@ -11,7 +11,6 @@ int main(int argc, char** argv) {
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  printf(" pass init\n");
   const int N = 16;
   vector<float> A(N*N);
   vector<float> B(N*N);
@@ -25,7 +24,6 @@ int main(int argc, char** argv) {
       B[N*i+j] = drand48();
     }
   }
-printf(" large matrix\n");
   int offset = N/size*rank;
   for (int i=0; i<N/size; i++)
     for (int j=0; j<N; j++)
@@ -35,7 +33,6 @@ printf(" large matrix\n");
       subB[N/size*i+j] = B[N*i+j+offset];
   int recv_from = (rank + 1) % size;
   int send_to = (rank - 1 + size) % size;
-printf("before the process\n");
   double comp_time = 0, comm_time = 0;
   for(int irank=0; irank<size; irank++) {
     auto tic = chrono::steady_clock::now();
@@ -56,7 +53,7 @@ printf("after the interact \n");
   }
 printf("before all gather\n");
   MPI_Allgather(&subC[0], N*N/size, MPI_FLOAT, &C[0], N*N/size, MPI_FLOAT, MPI_COMM_WORLD);
-printf("after all gather\n"); 
+printf("after all gather\n");
  for (int i=0; i<N; i++)
     for (int j=0; j<N; j++)
       for (int k=0; k<N; k++)

@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
       subA[N*i+j] = A[N*(i+offset)+j];
   for (int i=0; i<N; i++)
     for (int j=0; j<N/size; j++)
-      subB[N/size*i+j] = B[N*i+j+offset];
+      subB[N*i+j] = B[N*i+j+offset];
   int recv_from = (rank + 1) % size;
   int send_to = (rank - 1 + size) % size;
 
@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
     #pragma omp parallel for
       for (int j=0; j<N/size; j++)
         for (int k=0; k<N; k++)
-          subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
+          subC[N*i+j+offset] += subA[N*i+k] * subB[N*j+k];
 
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
