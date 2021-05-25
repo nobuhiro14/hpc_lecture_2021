@@ -24,6 +24,9 @@ int main(int argc, char** argv) {
       B[N*i+j] = drand48();
     }
   }
+  float *a;
+  cudaMallocManaged(&a, N*N*sizeof(float));
+cudaFree(a);
   int offset = N/size*rank;
   for (int i=0; i<N/size; i++)
     for (int j=0; j<N; j++)
