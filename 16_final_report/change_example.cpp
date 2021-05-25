@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
       subA[N*i+j] = A[N*(i+offset)+j];
   for (int i=0; i<N; i++)
     for (int j=0; j<N/size; j++)
-      subB[N*i+j] = B[N*i+j+offset];
+      subB[N*j+i] = B[N*i+j+offset];
   int recv_from = (rank + 1) % size;
   int send_to = (rank - 1 + size) % size;
 
