@@ -35,6 +35,7 @@ int main(int argc, char** argv) {
 
       float *a;
       cudaMallocManaged(&a, N*N*sizeof(float));
+      cudaMallocManaged(&a, N*N/size*sizeof(float));
       for (int i=0; i<N/size; i++)
         for (int j=0; j<N; j++)
           a[N*i+j] = A[N*(i+offset)+j];
@@ -69,6 +70,7 @@ MPI_Barrier(MPI_COMM_WORLD);
   if(rank==0) {
     double time = comp_time+comm_time;
     printf("N    : %d\n",N);
+    printf("size : %d\n",size);
     printf("comp : %lf s\n", comp_time);
     printf("comm : %lf s\n", comm_time);
     printf("total: %lf s (%lf GFlops)\n",time,2.*N*N*N/time/1e9);
