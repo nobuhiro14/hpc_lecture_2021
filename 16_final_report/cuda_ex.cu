@@ -24,9 +24,7 @@ int main(int argc, char** argv) {
       B[N*i+j] = drand48();
     }
   }
-  float *a;
-  cudaMallocManaged(&a, N*N*sizeof(float));
-cudaFree(a);
+
   int offset = N/size*rank;
   for (int i=0; i<N/size; i++)
     for (int j=0; j<N; j++)
@@ -34,6 +32,13 @@ cudaFree(a);
   for (int i=0; i<N; i++)
     for (int j=0; j<N/size; j++)
       subB[N/size*i+j] = B[N*i+j+offset];
+
+      float *a;
+      cudaMallocManaged(&a, N*N*sizeof(float));
+      for (int i=0; i<N/size; i++)
+        for (int j=0; j<N; j++)
+          a[N*i+j] = A[N*(i+offset)+j];
+    cudaFree(a);
   int recv_from = (rank + 1) % size;
   int send_to = (rank - 1 + size) % size;
   double comp_time = 0, comm_time = 0;
@@ -46,17 +51,13 @@ cudaFree(a);
           subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
-printf("before the interact \n");
 MPI_Barrier(MPI_COMM_WORLD);
     MPI_Send(&subB[0], N*N/size, MPI_FLOAT, send_to, 0, MPI_COMM_WORLD);
     MPI_Recv(&subB[0], N*N/size, MPI_FLOAT, recv_from, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     tic = chrono::steady_clock::now();
-printf("after the interact \n");
     comm_time += chrono::duration<double>(tic - toc).count();
   }
-printf("before all gather\n");
   MPI_Allgather(&subC[0], N*N/size, MPI_FLOAT, &C[0], N*N/size, MPI_FLOAT, MPI_COMM_WORLD);
-printf("after all gather\n");
  for (int i=0; i<N; i++)
     for (int j=0; j<N; j++)
       for (int k=0; k<N; k++)
