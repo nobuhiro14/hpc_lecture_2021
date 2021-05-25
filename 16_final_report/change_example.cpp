@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
       subA[N*i+j] = A[N*(i+offset)+j];
   for (int i=0; i<N; i++)
     for (int j=0; j<N/size; j++)
-      subB[N*j+i] = B[N*j+i+offset];
+      subB[N/size*i+j] = B[N*i+j+offset];
   int recv_from = (rank + 1) % size;
   int send_to = (rank - 1 + size) % size;
 
@@ -40,10 +40,9 @@ int main(int argc, char** argv) {
     auto tic = chrono::steady_clock::now();
     offset = N/size*((rank+irank) % size);
     for (int i=0; i<N/size; i++)
-      for (int j=0; j<N/size; j++)
-        for (int k=0; k<N; k++)
-          subC[N*i+j+offset] += subA[N*i+k] * subB[N*j+k];
-
+      for (int k=0; k<N; k++)
+        for (int j=0; j<N/size; j++)
+          subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
     MPI_Send(&subB[0], N*N/size, MPI_FLOAT, send_to, 0, MPI_COMM_WORLD);
