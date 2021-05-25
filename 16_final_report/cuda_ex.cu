@@ -47,6 +47,7 @@ printf("before the process\n");
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
 printf("before the interact \n");
+MPI_Barrier(MPI_COMM_WORLD);
     MPI_Send(&subB[0], N*N/size, MPI_FLOAT, send_to, 0, MPI_COMM_WORLD);
     MPI_Recv(&subB[0], N*N/size, MPI_FLOAT, recv_from, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     tic = chrono::steady_clock::now();
