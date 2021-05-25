@@ -4,14 +4,9 @@
 #include <vector>
 #include <chrono>
 #include<stdlib.h>
+#include<omp.h>
 using namespace std;
 
-__global__ void matrix(int *a, int*b, int*c, int N){
-  int i = blockIdx.x * blockDim.x + threadIdx.x;
-  if (i <=N){
-
-  }
-}
 int main(int argc, char** argv) {
   int size, rank;
   MPI_Init(&argc, &argv);
@@ -25,20 +20,12 @@ int main(int argc, char** argv) {
   vector<float> subA(N*N/size);
   vector<float> subB(N*N/size);
   vector<float> subC(N*N/size, 0);
-  int gpusize, gpurank ;
-
-  float *a;
-  float *b;
-  float *c;
-  //initial original matrix
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
       A[N*i+j] = drand48();
       B[N*i+j] = drand48();
     }
   }
-
-//initialize sub matrix for MPI
   int offset = N/size*rank;
   for (int i=0; i<N/size; i++)
     for (int j=0; j<N; j++)
@@ -49,31 +36,17 @@ int main(int argc, char** argv) {
   int recv_from = (rank + 1) % size;
   int send_to = (rank - 1 + size) % size;
 
-//start parallerithm
-  cudaGetDeviceCount(&gpusize);
-  cudaSetDevice(rank % gpusize);
-  cudaGetDevice(&gpurank);
-  cudaMalloc((void**)&a, N*N/size*sizeof(float));
-  cudaMalloc((void**)&b, N*N/size*sizeof(float));
-  cudaMalloc((void**)&c, N*N/size*sizeof(float));
-
   double comp_time = 0, comm_time = 0;
   for(int irank=0; irank<size; irank++) {
-    MPI_Barrier(MPI_COMM_WORLD);
-    //cudaMemcpy(a,subA,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
-    //cudaMemcpy(b,subB,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
-
-
     auto tic = chrono::steady_clock::now();
     offset = N/size*((rank+irank) % size);
+    #pragma omp parallel for 
     for (int i=0; i<N/size; i++)
       for (int j=0; j<N/size; j++)
         for (int k=0; k<N; k++)
           subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
-    //cudaMemcpy(c,subc,N*N/size*sizeof(float),cudaMemcpyDeviceToHost);
-
     MPI_Send(&subB[0], N*N/size, MPI_FLOAT, send_to, 0, MPI_COMM_WORLD);
     MPI_Recv(&subB[0], N*N/size, MPI_FLOAT, recv_from, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     tic = chrono::steady_clock::now();
@@ -97,7 +70,4 @@ int main(int argc, char** argv) {
     printf("error: %lf\n",err/N/N);
   }
   MPI_Finalize();
-  //cudaFree(a);
-  //cudaFree(b);
-  //cudaFree(c)
 }
