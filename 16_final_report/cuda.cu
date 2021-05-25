@@ -71,7 +71,7 @@ double time = comp_time+comm_time;
     printf("gpusize: %d\n",gpusize);
     printf("gpurank: %d\n",gpurank);
     cudaFree(a);
-    cudaFree(b);
-    cudaFree(c);
+    //cudaFree(b);
+    //cudaFree(c);
 
 }
