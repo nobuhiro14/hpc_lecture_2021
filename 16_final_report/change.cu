@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
   vector<float> C(N*N, 0);
   float subA[N*N/size];
   float subB[N*N/size];
-  float subC[N*N/size], 0);
+  float subC[N*N/size];
   int gpusize, gpurank ;
 
   float *a;
@@ -53,9 +53,9 @@ int main(int argc, char** argv) {
   cudaGetDeviceCount(&gpusize);
   cudaSetDevice(rank % gpusize);
   cudaGetDevice(&gpurank);
-  cudaMalloc((void**)&a, N*N/size*sizeof(float));
-  cudaMalloc((void**)&b, N*N/size*sizeof(float));
-  cudaMalloc((void**)&c, N*N/size*sizeof(float));
+  cudaMalloc(a, N*N/size*sizeof(float));
+  //cudaMalloc(b, N*N/size*sizeof(float));
+  //cudaMalloc(c, N*N/size*sizeof(float));
 
   double comp_time = 0, comm_time = 0;
   for(int irank=0; irank<size; irank++) {
@@ -97,8 +97,8 @@ int main(int argc, char** argv) {
     printf("error: %lf\n",err/N/N);
   }
   cudaFree(a);
-  cudaFree(b);
-  cudaFree(c);
+  //cudaFree(b);
+  //cudaFree(c);
   MPI_Finalize();
 
 }
