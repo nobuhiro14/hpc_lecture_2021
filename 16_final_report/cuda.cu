@@ -23,7 +23,7 @@ __global__ void matrix(float *a,float *b,float *c,int N, int offset,int size){
 
 int main(int argc, char** argv) {
   int size, rank;
-  int gpusize,
+  int gpusize;
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
   cudaMallocManaged(&a, N*N/size*sizeof(float));
   cudaMallocManaged(&b, N*N/size*sizeof(float));
   cudaMallocManaged(&c, N*N/size*sizeof(float));
-  cudaDeviceEnablePeerAccess(rank%gpusize, 0); 
+  cudaDeviceEnablePeerAccess(rank%gpusize, 0);
 
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
