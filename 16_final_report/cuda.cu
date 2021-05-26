@@ -8,20 +8,28 @@ using namespace std;
 
 __global__ void matrix(float *a,float *b,float *c,int N, int offset,int size){
   int l = blockIdx.x * blockDim.x + threadIdx.x;
-  if (l <N){
+  if (l <N/size){
     for (int i=0; i<N/size; i++)
-      for (int j=0; j<N/size; j++)
-           c[N*i+j+offset] += a[N*i+l]*b[N/size*l+j];
-      //subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
+      for (int k=0; k<N; k++)
+          c[N*i+l+offset] += a[N*i+k] * b[N/size*k+l];
+      /*
+      for (int i=0; i<N/size; i++)
+         for (int k=0; k<N; k++)
+           for (int j=0; j<N/size; j++)
+            subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
+      */
   }
 }
 
 int main(int argc, char** argv) {
   int size, rank;
+  int gpusize,
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  const int N = 16,M=256;
+  cudaGetDeviceCount(&gpusize);
+  cudaSetDevice(rank % gpusize);
+  const int N = 64,M=256;
   vector<float> A(N*N);
   vector<float> B(N*N);
   vector<float> C(N*N, 0);
@@ -34,7 +42,7 @@ int main(int argc, char** argv) {
   cudaMallocManaged(&a, N*N/size*sizeof(float));
   cudaMallocManaged(&b, N*N/size*sizeof(float));
   cudaMallocManaged(&c, N*N/size*sizeof(float));
-
+  cudaDeviceEnablePeerAccess(rank%gpusize, 0); 
 
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
@@ -75,7 +83,7 @@ int main(int argc, char** argv) {
     */
     offset = N/size*((rank+irank) % size);
 
-    matrix<<<(N+M-1)/M,M>>>(a,b,c,N,offset,size);
+    matrix<<<(N/size+M-1)/M,M>>>(a,b,c,N,offset,size);
 
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
