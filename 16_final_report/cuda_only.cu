@@ -22,13 +22,14 @@ int main(int argc, char** argv) {
 
   const int N = 32;
   const int M = 32;
+  int size = 4,rank = 0;
   vector<float> A(N*N);
   vector<float> B(N*N);
   vector<float> C(N*N, 0);
   vector<float> subA(N*N/size);
   vector<float> subB(N*N/size);
   vector<float> subC(N*N/size, 0);
-  int size = 4,rank = 0;
+
   float *a;
   float *b;
   float *c;
