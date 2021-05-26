@@ -10,7 +10,7 @@ __global__ void matrix(float *a,float *b,float *c,int N, int offset,int size){
   if (l <N){
     for (int i=0; i<N/size; i++)
       for (int j=0; j<N/size; j++)
-           c[N*i+j+offset] += a[N*i+l]*b[N/size*l+j]
+           c[N*i+j+offset] += a[N*i+l]*b[N/size*l+j];
       //subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
 
   }
@@ -83,10 +83,10 @@ int main(int argc, char** argv) {
     comm_time += chrono::duration<double>(tic - toc).count();
 
 
-  for (int i = 0:i<N*N/size;i++)
+  for (int i = 0;i<N*N/size;i++)
     c[i] -= subC[i];
   double err = 0;
-  for (int i = 0:i<N*N/size;i++)
+  for (int i = 0;i<N*N/size;i++)
       err += fabs(c[i]);
   if(rank==0) {
     double time = comp_time+comm_time;
