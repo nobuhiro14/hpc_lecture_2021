@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
     //MPI_Recv(&subB[0], N*N/size, MPI_FLOAT, recv_from, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
    MPI_Win_create(recv, N*N/size*sizeof(float), sizeof(float), MPI_INFO_NULL, MPI_COMM_WORLD, &win);
    MPI_Win_fence(0, win);
-   MPI_Put(subB, N*N/size, MPI_INT, send_to, 0, N*N/size, MPI_INT, win);
+   MPI_Put(subB, N*N/size, MPI_FLOAT, send_to, 0, N*N/size, MPI_FLOAT, win);
    MPI_Win_fence(0, win);
     tic = chrono::steady_clock::now();
     comm_time += chrono::duration<double>(tic - toc).count();
