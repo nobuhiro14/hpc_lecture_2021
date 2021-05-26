@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
   for (int i=0; i<N; i++)
     for (int j=0; j<N/size; j++)
       subB[N/size*i+j] = B[N*i+j+offset];
-
+      
       float *a;
       cudaMallocManaged(&a, N*N*sizeof(float));
       cudaMallocManaged(&a, N*N/size*sizeof(float));
