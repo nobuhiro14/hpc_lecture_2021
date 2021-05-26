@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
   //GPU computation
   double comp_time = 0, comm_time = 0;
     auto tic = chrono::steady_clock::now();
-    offset = N/size*((rank+irank) % size);
+    offset = N/size*((rank) % size);
 
     matrix<<<(N+M-1)/M,M>>>(a,b,c,N,offset,size);
     auto toc = chrono::steady_clock::now();
