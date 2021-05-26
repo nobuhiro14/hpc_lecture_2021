@@ -52,6 +52,7 @@ int main(int argc, char** argv) {
     for (int j=0; j<N/size; j++)
       subB[N/size*i+j] = B[N*i+j+offset];
 */
+  int offset = N/size*rank;
 
   for (int i=0; i<N/size; i++)
     for (int j=0; j<N; j++)
@@ -72,6 +73,8 @@ int main(int argc, char** argv) {
         for (int k=0; k<N; k++)
           subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
     */
+    offset = N/size*((rank+irank) % size);
+
     matrix<<<(N+M-1)/M,M>>>(a,b,c,N,offset,size);
 
     auto toc = chrono::steady_clock::now();
