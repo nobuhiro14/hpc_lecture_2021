@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
   int recv_from = (rank + 1) % size;
   int send_to = (rank - 1 + size) % size;
   // usual computation
-  offset = N/size*((rank+irank) % size);
+  offset = N/size*((rank) % size);
   for (int i=0; i<N/size; i++)
     for (int j=0; j<N/size; j++)
       for (int k=0; k<N; k++)
