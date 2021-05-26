@@ -12,10 +12,7 @@ __global__ void matrix(float *a,float *b,float *c,int N, int offset,int size){
       for (int j=0; j<N/size; j++)
            c[N*i+j+offset] += a[N*i+l]*b[N/size*l+j];
       //subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
-
   }
-
-
 }
 
 int main(int argc, char** argv) {
