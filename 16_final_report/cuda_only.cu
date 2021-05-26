@@ -11,7 +11,7 @@ __global__ void matrix(float *a,float *b,float *c,int N, int offset,int size){
     for (int i=0; i<N/size; i++)
       for (int j=0; j<N/size; j++)
            c[N*i+j+offset] += subA[N*i+l]*subB[N/size*l+j]
-      subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
+      //subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
 
   }
 
