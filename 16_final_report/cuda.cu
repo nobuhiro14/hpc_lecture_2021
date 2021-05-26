@@ -6,12 +6,14 @@
 #include<stdlib.h>
 using namespace std;
 
-__global__ void matrix(float *a,float *b,float *c,int N, int offset){
+__global__ void matrix(float *a,float *b,float *c,int N, int offset,int size){
   int l = blockIdx.x * blockDim.x + threadIdx.x;
-  for (int i=0; i<N/size; i++)
-    for (int j=0; j<N/size; j++)
-      for (int k=0; k<N; k++)
-
+  if (l <N){
+    for (int i=0; i<N/size; i++)
+      for (int j=0; j<N/size; j++)
+           c[N*i+j+offset] += a[N*i+l]*b[N/size*l+j];
+      //subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
+  }
 }
 
 int main(int argc, char** argv) {
@@ -70,6 +72,8 @@ int main(int argc, char** argv) {
         for (int k=0; k<N; k++)
           subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
     */
+    matrix<<<(N+M-1)/M,M>>>(a,b,c,N,offset,size);
+
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
 MPI_Barrier(MPI_COMM_WORLD);
