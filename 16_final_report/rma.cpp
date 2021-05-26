@@ -21,9 +21,9 @@ int main(int argc, char** argv) {
   vector<float> B(N*N);
   vector<float> C(N*N, 0);
   vector<float> subA(N*N/size);
-  vector<float> subB(N*N/size);
+  float subB[N*N/size];
   vector<float> subC(N*N/size, 0);
-  vector<float> recv(N*N/size);
+  float  recv[N*N/size)];
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
       A[N*i+j] = drand48();
