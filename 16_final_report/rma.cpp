@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
     comp_time += chrono::duration<double>(toc - tic).count();
     //MPI_Send(&subB[0], N*N/size, MPI_FLOAT, send_to, 0, MPI_COMM_WORLD);
     //MPI_Recv(&subB[0], N*N/size, MPI_FLOAT, recv_from, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-   MPI_Win_create(recv, N*N/size*sizeof(float), sizeof(float), MPI_INFO_NULL, MPI_COMM_WORLD, &win);
+   MPI_Win_allocate(recv, N*N/size*sizeof(float), sizeof(float), MPI_INFO_NULL, MPI_COMM_WORLD, &win);
    MPI_Win_fence(0, win);
    MPI_Put(subB, N*N/size, MPI_FLOAT, send_to, 0, N*N/size, MPI_FLOAT, win);
    MPI_Win_fence(0, win);
