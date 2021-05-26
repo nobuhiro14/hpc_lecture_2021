@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
   vector<float> subA(N*N/size);
   float subB[N*N/size];
   vector<float> subC(N*N/size, 0);
-  float  recv[N*N/size)];
+  float  recv[N*N/size];
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
       A[N*i+j] = drand48();
@@ -57,6 +57,8 @@ int main(int argc, char** argv) {
    MPI_Win_fence(0, win);
    MPI_Put(subB, N*N/size, MPI_FLOAT, send_to, 0, N*N/size, MPI_FLOAT, win);
    MPI_Win_fence(0, win);
+   for(int i = 0:i<N*N/size;i++)
+      subB[i] = recv[i];
     tic = chrono::steady_clock::now();
     comm_time += chrono::duration<double>(tic - toc).count();
   }
