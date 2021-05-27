@@ -84,6 +84,7 @@ int main(int argc, char** argv) {
     offset = N/size*((rank+irank) % size);
 
     matrix<<<(N/size+M-1)/M,M>>>(a,b,c,N,offset,size);
+    cudaDeviceSynchronize();
 
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
