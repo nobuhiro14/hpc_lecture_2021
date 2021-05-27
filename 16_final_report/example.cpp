@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  const int N = 256;
+  const int N = 32;
   vector<float> A(N*N);
   vector<float> B(N*N);
   vector<float> C(N*N, 0);
@@ -43,6 +43,12 @@ int main(int argc, char** argv) {
       for (int j=0; j<N/size; j++)
         for (int k=0; k<N; k++)
           subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
+          /*
+          for (int i=0; i<N/size; i++)
+             for (int k=0; k<N; k++)
+               for (int j=0; j<N/size; j++)
+                subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
+          */
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
     MPI_Request request[2];
