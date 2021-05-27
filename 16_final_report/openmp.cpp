@@ -41,8 +41,8 @@ int main(int argc, char** argv) {
     offset = N/size*((rank+irank) % size);
     #pragma omp parallel for
     for (int i=0; i<N/size; i++)
-      for (int j=0; j<N/size; j++)
        for (int k=0; k<N; k++)
+        for (int j=0; j<N/size; j++)
           subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
