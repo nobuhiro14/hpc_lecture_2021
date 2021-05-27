@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
   for (int i=0; i<N; i++)
     for (int j=0; j<N/size; j++)
       b[N/size*i+j] = B[N*i+j+offset];
-
+printf("after memory copied\n");
   int recv_from = (rank + 1) % size;
   int send_to = (rank - 1 + size) % size;
   double comp_time = 0, comm_time = 0;
@@ -82,9 +82,12 @@ int main(int argc, char** argv) {
           subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
     */
     offset = N/size*((rank+irank) % size);
+    printf("before matrix\n");
 
     matrix<<<(N/size+M-1)/M,M>>>(a,b,c,N,offset,size);
     cudaDeviceSynchronize();
+    printf("after matrix\n");
+
 
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
@@ -92,6 +95,7 @@ int main(int argc, char** argv) {
 
     MPI_Send(&b[0], N*N/size, MPI_FLOAT, send_to, 0, MPI_COMM_WORLD);
     MPI_Recv(&b[0], N*N/size, MPI_FLOAT, recv_from, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    printf("after comm\n");
 
     tic = chrono::steady_clock::now();
     comm_time += chrono::duration<double>(tic - toc).count();
