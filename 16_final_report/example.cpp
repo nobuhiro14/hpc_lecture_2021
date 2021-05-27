@@ -70,3 +70,4 @@ int main(int argc, char** argv) {
     printf("error: %lf\n",err/N/N);
   }
   MPI_Finalize();
+}
