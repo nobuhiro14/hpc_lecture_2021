@@ -39,9 +39,9 @@ int main(int argc, char** argv) {
   float *a;
   float *b;
   float *c;
-  cudaMallocManaged(&a, N*N/size*sizeof(float));
-  cudaMallocManaged(&b, N*N/size*sizeof(float));
-  cudaMallocManaged(&c, N*N/size*sizeof(float));
+  cudaMalloc(&a, N*N/size*sizeof(float));
+  cudaMalloc(&b, N*N/size*sizeof(float));
+  cudaMalloc(&c, N*N/size*sizeof(float));
   cudaDeviceEnablePeerAccess(rank%gpusize, 0);
 
   for (int i=0; i<N; i++) {
@@ -64,11 +64,12 @@ int main(int argc, char** argv) {
 
   for (int i=0; i<N/size; i++)
     for (int j=0; j<N; j++)
-      a[N*i+j] = A[N*(i+offset)+j];
+      subA[N*i+j] = A[N*(i+offset)+j];
   for (int i=0; i<N; i++)
     for (int j=0; j<N/size; j++)
-      b[N/size*i+j] = B[N*i+j+offset];
-printf("after memory copied\n");
+      subB[N/size*i+j] = B[N*i+j+offset];
+  cudaMemcpy(a,subA,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
+  cudaMemcpy(b,subB,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
   int recv_from = (rank + 1) % size;
   int send_to = (rank - 1 + size) % size;
   double comp_time = 0, comm_time = 0;
@@ -95,15 +96,16 @@ printf("after memory copied\n");
 
     MPI_Request request[2];
     MPI_Barrier(MPI_COMM_WORLD);
-    MPI_Isend(&b[0], N*N/size, MPI_FLOAT, send_to, 0, MPI_COMM_WORLD, &request[0]);
-    MPI_Irecv(&b[0], N*N/size, MPI_FLOAT, recv_from, 0, MPI_COMM_WORLD, &request[1]);
+    MPI_Isend(&subB[0], N*N/size, MPI_FLOAT, send_to, 0, MPI_COMM_WORLD, &request[0]);
+    MPI_Irecv(&subB[0], N*N/size, MPI_FLOAT, recv_from, 0, MPI_COMM_WORLD, &request[1]);
     MPI_Waitall(2, request, MPI_STATUS_IGNORE);
     printf("after comm\n");
-
+    cudaMemcpy(b,subB,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
     tic = chrono::steady_clock::now();
     comm_time += chrono::duration<double>(tic - toc).count();
   }
-  MPI_Allgather(&c[0], N*N/size, MPI_FLOAT, &C[0], N*N/size, MPI_FLOAT, MPI_COMM_WORLD);
+  cudaMemcpy(subC,c,N*N/size*sizeof(float),cudaMemcpyDeviceToHost);
+  MPI_Allgather(&subC[0], N*N/size, MPI_FLOAT, &C[0], N*N/size, MPI_FLOAT, MPI_COMM_WORLD);
   MPI_Barrier(MPI_COMM_WORLD);
 
  for (int i=0; i<N; i++)
