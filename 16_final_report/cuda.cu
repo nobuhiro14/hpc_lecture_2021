@@ -93,8 +93,11 @@ printf("after memory copied\n");
     comp_time += chrono::duration<double>(toc - tic).count();
     //MPI_Barrier(MPI_COMM_WORLD);
 
-    MPI_Send(&b[0], N*N/size, MPI_FLOAT, send_to, 0, MPI_COMM_WORLD);
-    MPI_Recv(&b[0], N*N/size, MPI_FLOAT, recv_from, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Request request[2];
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Isend(&subB[0], N*N/size, MPI_FLOAT, send_to, 0, MPI_COMM_WORLD, &request[0]);
+    MPI_Irecv(&subB[0], N*N/size, MPI_FLOAT, recv_from, 0, MPI_COMM_WORLD, &request[1]);
+    MPI_Waitall(2, request, MPI_STATUS_IGNORE);
     printf("after comm\n");
 
     tic = chrono::steady_clock::now();
