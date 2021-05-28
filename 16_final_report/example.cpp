@@ -52,8 +52,8 @@ int main(int argc, char** argv) {
     tic = chrono::steady_clock::now();
     comm_time += chrono::duration<double>(tic - toc).count();
   }
-  int *errors;
-  MPI_Allgather(&subC[0], N*N/size, MPI_FLOAT, &C[0], N*N/size, MPI_FLOAT, MPI_COMM_WORLD,&errors);
+  MPI_Barrier(MPI_COMM_WORLD); 
+  MPI_Allgather(&subC[0], N*N/size, MPI_FLOAT, &C[0], N*N/size, MPI_FLOAT, MPI_COMM_WORLD);
   for (int i=0; i<N; i++)
     for (int j=0; j<N; j++)
       for (int k=0; k<N; k++)
@@ -64,7 +64,6 @@ int main(int argc, char** argv) {
       err += fabs(C[N*i+j]);
   if(rank==0) {
     double time = comp_time+comm_time;
-    printf("errr : %d\n",errors);
     printf("N    : %d\n",N);
     printf("comp : %lf s\n", comp_time);
     printf("comm : %lf s\n", comm_time);
