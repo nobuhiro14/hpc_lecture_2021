@@ -33,9 +33,10 @@ int main(int argc, char** argv) {
   vector<float> A(N*N);
   vector<float> B(N*N);
   vector<float> C(N*N, 0);
-  vector<float> subA(N*N/size);
-  vector<float> subB(N*N/size);
-  vector<float> subC(N*N/size, 0);
+  float *subA, subB, subC;
+  subA = (float*)malloc(N*N/size*sizeof(float));
+  subB = (float*)malloc(N*N/size*sizeof(float));
+  subC = (float*)malloc(N*N/size*sizeof(float));
   float *a;
   float *b;
   float *c;
