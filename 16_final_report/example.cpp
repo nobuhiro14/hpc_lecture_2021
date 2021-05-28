@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
     comm_time += chrono::duration<double>(tic - toc).count();
   }
   int *errors;
-  MPI_Allgather(&subC[0], N*N/size, MPI_FLOAT, &C[0], N*N/size, MPI_FLOAT, MPI_COMM_WORLD,errors);
+  MPI_Allgather(&subC[0], N*N/size, MPI_FLOAT, &C[0], N*N/size, MPI_FLOAT, MPI_COMM_WORLD,&errors);
   for (int i=0; i<N; i++)
     for (int j=0; j<N; j++)
       for (int k=0; k<N; k++)
