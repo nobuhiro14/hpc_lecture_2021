@@ -115,6 +115,7 @@ printf("after memory copied\n");
       err += fabs(C[N*i+j]);
   if(rank==0) {
     double time = comp_time+comm_time;
+    printf("A[10]: %lf\n",A[10]);
     printf("a[10]: %lf\n",a[10]);
     printf("N    : %d\n",N);
     printf("size : %d\n",size);
