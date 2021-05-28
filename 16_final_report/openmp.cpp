@@ -46,12 +46,13 @@ int main(int argc, char** argv) {
           subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
+    MPI_Barrier(MPI_COMM_WORLD); 
     MPI_Send(&subB[0], N*N/size, MPI_FLOAT, send_to, 0, MPI_COMM_WORLD);
     MPI_Recv(&subB[0], N*N/size, MPI_FLOAT, recv_from, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     tic = chrono::steady_clock::now();
     comm_time += chrono::duration<double>(tic - toc).count();
   }
-  MPI_Barrier(MPI_COMM_WORLD); 
+  MPI_Barrier(MPI_COMM_WORLD);
   MPI_Allgather(&subC[0], N*N/size, MPI_FLOAT, &C[0], N*N/size, MPI_FLOAT, MPI_COMM_WORLD);
   for (int i=0; i<N; i++)
     for (int j=0; j<N; j++)
