@@ -10,8 +10,8 @@ __global__ void matrix(float *a,float *b,float *c,int N, int offset,int size){
   int l = blockIdx.x * blockDim.x + threadIdx.x;
   if (l <N/size){
     for (int i=0; i<N/size; i++)
-      for (int k=0; k<N; k++)
-          c[N*i+l+offset] += a[N*i+k] * b[N/size*k+l];
+      for (int j=0; j<N/size; j++)
+        c[N*i+j+offset] += a[N*i+l] * b[N/size*l+j];
       /*
       for (int i=0; i<N/size; i++)
          for (int k=0; k<N; k++)
