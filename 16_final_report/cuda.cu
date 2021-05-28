@@ -84,7 +84,7 @@ printf("after memory copied\n");
     offset = N/size*((rank+irank) % size);
     printf("before matrix\n");
 
-    matrix<<<(N/size+M-1)/M,M>>>(a,b,c,N,offset,size);
+    matrix<<<(N+M-1)/M,M>>>(a,b,c,N,offset,size);
     cudaDeviceSynchronize();
     printf("after matrix\n");
 
