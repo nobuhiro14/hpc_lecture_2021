@@ -124,5 +124,4 @@ int main(int argc, char** argv) {
   cudaFree(a);
   cudaFree(b);
   cudaFree(c);
-  MPI_Finalize();
 }
