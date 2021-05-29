@@ -129,6 +129,10 @@ int main(int argc, char** argv) {
     printf("total: %lf s (%lf GFlops)\n",time,2.*N*N*N/time/1e9);
     printf("error: %lf\n",err/N/N);
   }
+  free(subA);
+  free(subB);
+  free(subC);
+  free(recv);
   cudaFree(a);
   cudaFree(b);
   cudaFree(c);
