@@ -98,14 +98,9 @@ int main(int argc, char** argv) {
 
   cudaMemcpy(subC,c,N*N/size*sizeof(float),cudaMemcpyDeviceToHost);
 
- for (int i=0; i<N; i++)
-    for (int j=0; j<N; j++)
-      for (int k=0; k<N; k++)
-        subC[N*i+j] -= A[N*i+k] * B[N*k+j];
+
   double err = 0;
-  for (int i=0; i<N; i++)
-    for (int j=0; j<N; j++)
-      err += fabs(C[N*i+j]);
+  
   if(rank==0) {
     double time = comp_time+comm_time;
     printf("A[10]: %lf\n",A[10]);
