@@ -21,7 +21,7 @@ __global__ void matrix(float *a,float *b,float *c,int N, int offset,int size){
 }
 
 int main(int argc, char** argv) {
-  
+
 
   int size, rank;
   int gpusize;
@@ -36,17 +36,17 @@ int main(int argc, char** argv) {
   vector<float> B(N*N);
   vector<float> C(N*N, 0);
   float *subA, *subB, *subC,*recv;
-  subA = (float *)malloc(N*N*sizeof(float));
-  subB = (float *)malloc(N*N*sizeof(float));
-  subC = (float *)malloc(N*N*sizeof(float));
-  recv = (float *)malloc(N*N*sizeof(float));
+  subA = (float *)malloc(N*N/size*sizeof(float));
+  subB = (float *)malloc(N*N/size*sizeof(float));
+  subC = (float *)malloc(N*N/size*sizeof(float));
+  recv = (float *)malloc(N*N/size*sizeof(float));
 
   float *a;
   float *b;
   float *c;
-  cudaMalloc(&a, N*N*sizeof(float));
-  cudaMalloc(&b, N*N*sizeof(float));
-  cudaMalloc(&c, N*N*sizeof(float));
+  cudaMalloc(&a, N*N/size*sizeof(float));
+  cudaMalloc(&b, N*N/size*sizeof(float));
+  cudaMalloc(&c, N*N/size*sizeof(float));
 
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
