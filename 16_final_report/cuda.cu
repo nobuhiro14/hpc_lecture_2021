@@ -3,7 +3,6 @@
 #include <cmath>
 #include <vector>
 #include <chrono>
-#include<stdlib.h>
 using namespace std;
 
 __global__ void matrix(float *a,float *b,float *c,int N, int offset,int size){
