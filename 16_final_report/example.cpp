@@ -3,7 +3,6 @@
 #include <cmath>
 #include <vector>
 #include <chrono>
-#include<stdlib.h>
 using namespace std;
 
 int main(int argc, char** argv) {
