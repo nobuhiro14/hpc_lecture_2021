@@ -1,3 +1,4 @@
+#include <mpi.h>
 #include <cstdio>
 #include <cmath>
 #include <vector>
