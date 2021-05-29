@@ -34,9 +34,9 @@ int main(int argc, char** argv) {
   float *a;
   float *b;
   float *c;
-  cudaMalloc(a, N*N/size*sizeof(float));
-  cudaMalloc(b, N*N/size*sizeof(float));
-  cudaMalloc(c, N*N/size*sizeof(float));
+  cudaMalloc(&a, N*N/size*sizeof(float));
+  cudaMalloc(&b, N*N/size*sizeof(float));
+  cudaMalloc(&c, N*N/size*sizeof(float));
 
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
     for (int j=0; j<N/size; j++)
       subB[N/size*i+j] = B[N*i+j+offset];
 */
-  
+
   //cudaMemcpy(subA,a,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
   //cudaMemcpy(subB,b,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
 
