@@ -29,10 +29,7 @@ int main(int argc, char** argv) {
   vector<float> B(N*N);
   vector<float> C(N*N, 0);
   float *subA, *subB, *subC,*recv;
-  subA = (float *)malloc(N*sizeof(float));
-  subB = (float *)malloc(N*sizeof(float));
-  subC = (float *)malloc(N*sizeof(float));
-  recv = (float *)malloc(N*sizeof(float));
+
 
   float *a;
   float *b;
@@ -57,22 +54,13 @@ int main(int argc, char** argv) {
     for (int j=0; j<N/size; j++)
       subB[N/size*i+j] = B[N*i+j+offset];
 */
-  int offset = N/size*rank;
-
-  for (int i=0; i<N/size; i++)
-    for (int j=0; j<N; j++)
-      subA[N*i+j] = A[N*(i+0)+j];
-  for (int i=0; i<N; i++)
-    for (int j=0; j<N/size; j++)
-      subB[N/size*i+j] = B[N*i+j+offset];
+  
   //cudaMemcpy(subA,a,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
   //cudaMemcpy(subB,b,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
 
 
-  free(subA);
-  free(subB);
-  free(subC);
-  free(recv);
+
+
   cudaFree(a);
   cudaFree(b);
   cudaFree(c);
