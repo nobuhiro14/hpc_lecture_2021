@@ -22,7 +22,13 @@ __global__ void matrix(float *a,float *b,float *c,int N, int offset,int size){
 int main(int argc, char** argv) {
   int size=1, rank=0;
 
-
+  int size, rank;
+  int gpusize;
+  MPI_Init(&argc, &argv);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  cudaGetDeviceCount(&gpusize);
+  cudaSetDevice(rank % gpusize);
 
   const int N = 64;
   vector<float> A(N*N);
@@ -80,4 +86,6 @@ int main(int argc, char** argv) {
   cudaFree(a);
   cudaFree(b);
   cudaFree(c);
+  MPI_Finalize();
+
 }
