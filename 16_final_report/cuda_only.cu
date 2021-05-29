@@ -21,7 +21,7 @@ __global__ void matrix(float *a,float *b,float *c,int N, int offset,int size){
 }
 
 int main(int argc, char** argv) {
-  int size=1, rank=0;
+  
 
   int size, rank;
   int gpusize;
