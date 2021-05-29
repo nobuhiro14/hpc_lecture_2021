@@ -21,11 +21,11 @@ __global__ void matrix(float *a,float *b,float *c,int N, int offset,int size){
 
 int main(int argc, char** argv) {
   int size=1, rank=0;
-  int gpusize;
+
 
   cudaGetDeviceCount(&gpusize);
   cudaSetDevice(rank % gpusize);
-  const int N = 64,M=256;
+  const int N = 64;
   vector<float> A(N*N);
   vector<float> B(N*N);
   vector<float> C(N*N, 0);
@@ -41,7 +41,6 @@ int main(int argc, char** argv) {
   cudaMalloc(&a, N*N/size*sizeof(float));
   cudaMalloc(&b, N*N/size*sizeof(float));
   cudaMalloc(&c, N*N/size*sizeof(float));
-  cudaDeviceEnablePeerAccess(rank%gpusize, 0);
 
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
@@ -67,10 +66,10 @@ int main(int argc, char** argv) {
   for (int i=0; i<N; i++)
     for (int j=0; j<N/size; j++)
       subB[N/size*i+j] = B[N*i+j+offset];
-  cudaMemcpy(subA,a,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
-  cudaMemcpy(subB,b,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
+  //cudaMemcpy(subA,a,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
+  //cudaMemcpy(subB,b,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
 
-  
+
   free(subA);
   free(subB);
   free(subC);
