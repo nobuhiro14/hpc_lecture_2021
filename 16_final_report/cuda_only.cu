@@ -23,8 +23,7 @@ int main(int argc, char** argv) {
   int size=1, rank=0;
 
 
-  cudaGetDeviceCount(&gpusize);
-  cudaSetDevice(rank % gpusize);
+  
   const int N = 64;
   vector<float> A(N*N);
   vector<float> B(N*N);
