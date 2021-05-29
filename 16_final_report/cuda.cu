@@ -33,10 +33,11 @@ int main(int argc, char** argv) {
   vector<float> A(N*N);
   vector<float> B(N*N);
   vector<float> C(N*N, 0);
-  float *subA, *subB, *subC;
+  float *subA, *subB, *subC,recv;
   subA = (float*)malloc(N*sizeof(float));
   subB = (float*)malloc(N*sizeof(float));
   subC = (float*)malloc(N*sizeof(float));
+  recv = (float*)malloc(N*sizeof(float));
 
   float *a;
   float *b;
@@ -97,10 +98,11 @@ int main(int argc, char** argv) {
     //MPI_Barrier(MPI_COMM_WORLD);
 
     MPI_Request request[2];
-    MPI_Barrier(MPI_COMM_WORLD);
-    MPI_Isend(&subB[0], N*N/size, MPI_FLOAT, send_to, 0, MPI_COMM_WORLD, &request[0]);
-    MPI_Irecv(&subB[0], N*N/size, MPI_FLOAT, recv_from, 0, MPI_COMM_WORLD, &request[1]);
-    MPI_Waitall(2, request, MPI_STATUS_IGNORE);
+   MPI_Isend(&subB[0], N*N/size, MPI_FLOAT, send_to, 0, MPI_COMM_WORLD, &request[0]);
+   MPI_Irecv(&recv[0], N*N/size, MPI_FLOAT, recv_from, 0, MPI_COMM_WORLD, &request[1]);
+   MPI_Waitall(2, request, MPI_STATUS_IGNORE);
+   for (int i=0; i<N*N/size; i++)
+     subB[i] = recv[i];
     printf("after comm\n");
     cudaMemcpy(b,subB,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
     tic = chrono::steady_clock::now();
@@ -121,7 +123,6 @@ int main(int argc, char** argv) {
   if(rank==0) {
     double time = comp_time+comm_time;
     printf("A[10]: %lf\n",A[10]);
-    printf("a[10]: %lf\n",a[10]);
     printf("N    : %d\n",N);
     printf("size : %d\n",size);
     printf("comp : %lf s\n", comp_time);
