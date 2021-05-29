@@ -85,11 +85,9 @@ int main(int argc, char** argv) {
           subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
     */
     offset = N/size*((rank+irank) % size);
-    printf("before matrix\n");
 
     matrix<<<(N+M-1)/M,M>>>(a,b,c,N,offset,size);
     cudaDeviceSynchronize();
-    printf("after matrix\n");
 
 
     auto toc = chrono::steady_clock::now();
@@ -102,7 +100,6 @@ int main(int argc, char** argv) {
    MPI_Waitall(2, request, MPI_STATUS_IGNORE);
    for (int i=0; i<N*N/size; i++)
      subB[i] = recv[i];
-    printf("after comm\n");
     cudaMemcpy(b,subB,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
     tic = chrono::steady_clock::now();
     comm_time += chrono::duration<double>(tic - toc).count();
@@ -121,7 +118,6 @@ int main(int argc, char** argv) {
       err += fabs(C[N*i+j]);
   if(rank==0) {
     double time = comp_time+comm_time;
-    printf("A[10]: %lf\n",A[10]);
     printf("N    : %d\n",N);
     printf("size : %d\n",size);
     printf("comp : %lf s\n", comp_time);
