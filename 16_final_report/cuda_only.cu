@@ -2,15 +2,14 @@
 #include <cmath>
 #include <vector>
 #include <chrono>
-#include<stdlib.h>
 using namespace std;
 
 __global__ void matrix(float *a,float *b,float *c,int N, int offset,int size){
   int l = blockIdx.x * blockDim.x + threadIdx.x;
   if (l <N/size){
     for (int i=0; i<N/size; i++)
-      for (int k=0; k<N; k++)
-          c[N*i+l+offset] += a[N*i+k] * b[N/size*k+l];
+      for (int j=0; j<N/size; j++)
+        c[N*i+j+offset] += a[N*i+l] * b[N/size*l+j];
       /*
       for (int i=0; i<N/size; i++)
          for (int k=0; k<N; k++)
@@ -21,24 +20,28 @@ __global__ void matrix(float *a,float *b,float *c,int N, int offset,int size){
 }
 
 int main(int argc, char** argv) {
+  int size=1, rank=0;
+  int gpusize;
 
-  const int N = 32;
-  const int M = 32;
-  int size = 4,rank = 0;
+  cudaGetDeviceCount(&gpusize);
+  cudaSetDevice(rank % gpusize);
+  const int N = 64,M=256;
   vector<float> A(N*N);
   vector<float> B(N*N);
   vector<float> C(N*N, 0);
-  vector<float> subA(N*N/size);
-  vector<float> subB(N*N/size);
-  vector<float> subC(N*N/size, 0);
+  float *subA, *subB, *subC,*recv;
+  subA = (float *)malloc(N*sizeof(float));
+  subB = (float *)malloc(N*sizeof(float));
+  subC = (float *)malloc(N*sizeof(float));
+  recv = (float *)malloc(N*sizeof(float));
 
   float *a;
   float *b;
   float *c;
-  cudaMallocManaged(&a, N*N/size*sizeof(float));
-  cudaMallocManaged(&b, N*N/size*sizeof(float));
-  cudaMallocManaged(&c, N*N/size*sizeof(float));
-
+  cudaMalloc(&a, N*N/size*sizeof(float));
+  cudaMalloc(&b, N*N/size*sizeof(float));
+  cudaMalloc(&c, N*N/size*sizeof(float));
+  cudaDeviceEnablePeerAccess(rank%gpusize, 0);
 
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
@@ -47,7 +50,7 @@ int main(int argc, char** argv) {
     }
   }
 
-
+/*
   int offset = N/size*rank;
   for (int i=0; i<N/size; i++)
     for (int j=0; j<N; j++)
@@ -55,45 +58,58 @@ int main(int argc, char** argv) {
   for (int i=0; i<N; i++)
     for (int j=0; j<N/size; j++)
       subB[N/size*i+j] = B[N*i+j+offset];
+*/
+  int offset = N/size*rank;
 
   for (int i=0; i<N/size; i++)
     for (int j=0; j<N; j++)
-      a[N*i+j] = A[N*(i+offset)+j];
+      subA[N*i+j] = A[N*(i+offset)+j];
   for (int i=0; i<N; i++)
     for (int j=0; j<N/size; j++)
-      b[N/size*i+j] = B[N*i+j+offset];
-
+      subB[N/size*i+j] = B[N*i+j+offset];
+  cudaMemcpy(a,subA,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
+  cudaMemcpy(b,subB,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
   int recv_from = (rank + 1) % size;
   int send_to = (rank - 1 + size) % size;
-  // usual computation
-  offset = N/size*((rank) % size);
-  for (int i=0; i<N/size; i++)
-    for (int j=0; j<N/size; j++)
-      for (int k=0; k<N; k++)
-        subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
-
-
-  //GPU computation
   double comp_time = 0, comm_time = 0;
+  for(int irank=0; irank<size; irank++) {
     auto tic = chrono::steady_clock::now();
-    offset = N/size*((rank) % size);
+    /*
+    offset = N/size*((rank+irank) % size);
+    for (int i=0; i<N/size; i++)
+      for (int j=0; j<N/size; j++)
+        for (int k=0; k<N; k++)
+          subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
+    */
+    offset = N/size*((rank+irank) % size);
+    printf("before matrix\n");
 
-    matrix<<<(N/size+M-1)/M,M>>>(a,b,c,N,offset,size);
+    matrix<<<(N+M-1)/M,M>>>(a,b,c,N,offset,size);
     cudaDeviceSynchronize();
+    printf("after matrix\n");
+
+
     auto toc = chrono::steady_clock::now();
     comp_time += chrono::duration<double>(toc - tic).count();
-
+    //MPI_Barrier(MPI_COMM_WORLD);
+    printf("after comm\n");
+    cudaMemcpy(b,subB,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
     tic = chrono::steady_clock::now();
     comm_time += chrono::duration<double>(tic - toc).count();
+  }
+  cudaMemcpy(subC,c,N*N/size*sizeof(float),cudaMemcpyDeviceToHost);
 
-
-  for (int i = 0;i<N*N/size;i++)
-    c[i] -= subC[i];
+ for (int i=0; i<N; i++)
+    for (int j=0; j<N; j++)
+      for (int k=0; k<N; k++)
+        subC[N*i+j] -= A[N*i+k] * B[N*k+j];
   double err = 0;
-  for (int i = 0;i<N*N/size;i++)
-      err += fabs(c[i]);
+  for (int i=0; i<N; i++)
+    for (int j=0; j<N; j++)
+      err += fabs(C[N*i+j]);
   if(rank==0) {
     double time = comp_time+comm_time;
+    printf("A[10]: %lf\n",A[10]);
     printf("N    : %d\n",N);
     printf("size : %d\n",size);
     printf("comp : %lf s\n", comp_time);
@@ -101,7 +117,12 @@ int main(int argc, char** argv) {
     printf("total: %lf s (%lf GFlops)\n",time,2.*N*N*N/time/1e9);
     printf("error: %lf\n",err/N/N);
   }
+  free(subA);
+  free(subB);
+  free(subC);
+  free(recv);
   cudaFree(a);
   cudaFree(b);
   cudaFree(c);
+  MPI_Finalize();
 }
