@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
   int size=1, rank=0;
 
 
-  
+
   const int N = 64;
   vector<float> A(N*N);
   vector<float> B(N*N);
@@ -37,9 +37,9 @@ int main(int argc, char** argv) {
   float *a;
   float *b;
   float *c;
-  cudaMalloc(&a, N*N/size*sizeof(float));
-  cudaMalloc(&b, N*N/size*sizeof(float));
-  cudaMalloc(&c, N*N/size*sizeof(float));
+  cudaMalloc(a, N*N/size*sizeof(float));
+  cudaMalloc(b, N*N/size*sizeof(float));
+  cudaMalloc(c, N*N/size*sizeof(float));
 
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
