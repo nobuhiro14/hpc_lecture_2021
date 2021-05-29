@@ -83,8 +83,8 @@ int main(int argc, char** argv) {
     offset = N/size*((rank) % size);
     printf("before matrix\n");
 
-    matrix<<<(N+M-1)/M,M>>>(a,b,c,N,offset,size);
-    cudaDeviceSynchronize();
+    //matrix<<<(N+M-1)/M,M>>>(a,b,c,N,offset,size);
+    //cudaDeviceSynchronize();
     printf("after matrix\n");
 
 
@@ -92,15 +92,15 @@ int main(int argc, char** argv) {
     comp_time += chrono::duration<double>(toc - tic).count();
     //MPI_Barrier(MPI_COMM_WORLD);
     printf("after comm\n");
-    cudaMemcpy(b,subB,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
+    //cudaMemcpy(b,subB,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
     tic = chrono::steady_clock::now();
     comm_time += chrono::duration<double>(tic - toc).count();
 
-  cudaMemcpy(subC,c,N*N/size*sizeof(float),cudaMemcpyDeviceToHost);
+  //cudaMemcpy(subC,c,N*N/size*sizeof(float),cudaMemcpyDeviceToHost);
 
 
   double err = 0;
-  
+
   if(rank==0) {
     double time = comp_time+comm_time;
     printf("A[10]: %lf\n",A[10]);
