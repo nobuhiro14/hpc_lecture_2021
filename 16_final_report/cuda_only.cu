@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
         for (int k=0; k<N; k++)
           subC[N*i+j+offset] += subA[N*i+k] * subB[N/size*k+j];
     */
-    offset = N/size*((rank+irank) % size);
+    offset = N/size*((rank) % size);
     printf("before matrix\n");
 
     matrix<<<(N+M-1)/M,M>>>(a,b,c,N,offset,size);
@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
     cudaMemcpy(b,subB,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
     tic = chrono::steady_clock::now();
     comm_time += chrono::duration<double>(tic - toc).count();
-  
+
   cudaMemcpy(subC,c,N*N/size*sizeof(float),cudaMemcpyDeviceToHost);
 
  for (int i=0; i<N; i++)
