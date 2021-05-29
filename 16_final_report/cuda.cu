@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   cudaGetDeviceCount(&gpusize);
   cudaSetDevice(rank % gpusize);
-  const int N = 64,M=256;
+  const int N = 128,M=256;
   vector<float> A(N*N);
   vector<float> B(N*N);
   vector<float> C(N*N, 0);
