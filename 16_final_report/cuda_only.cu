@@ -67,8 +67,8 @@ int main(int argc, char** argv) {
   for (int i=0; i<N; i++)
     for (int j=0; j<N/size; j++)
       subB[N/size*i+j] = B[N*i+j+offset];
-  cudaMemcpy(a,subA,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
-  cudaMemcpy(b,subB,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
+  cudaMemcpy(subA,a,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
+  cudaMemcpy(subB,b,N*N/size*sizeof(float),cudaMemcpyHostToDevice);
 
   double comp_time = 0, comm_time = 0;
 
